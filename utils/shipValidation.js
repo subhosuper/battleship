@@ -46,6 +46,25 @@ const checkOverlap = (shipsPlaced, coordinates) => {
     });
 }
 
+const checkBoundaryOverlap = (shipsPlaced, coordinates) => {
+    const startCoordinate = [coordinates[0][0]-1, coordinates[0][1]] // Gets the top boundary
+    const endCoordinate = coordinates[coordinates.length - 1]; ++endCoordinate[0]; // Gets the bottom boundary
+
+    if (!shipsPlaced.length)
+        return {}
+    
+    shipsPlaced.map(dbVal => {
+        coordinates.map(inputVal => {
+            if (inputVal[0] === dbVal[0] && inputVal[1]-1 !== dbVal[1])
+            if (inputVal[0] === dbVal[0] && inputVal[1]+1 !== dbVal[1])
+            if (JSON.stringify(dbVal) !== JSON.stringify(startCoordinate))
+            if (JSON.stringify(dbVal) !== JSON.stringify(endCoordinate)) 
+            return {}
+        });
+    })
+    throw Error("Coordinates shouldn't overlap on the top, bottom, and both sides of any ship present on the board");
+}
+
 exports.shipDataValidations = async (req, res, next) => {
     // ship validations
     const shipsPlaced = await Ship.distinct("coordinates", {sessionId: req.headers["sessionid"]})
@@ -58,6 +77,7 @@ exports.shipDataValidations = async (req, res, next) => {
     try{
         validateCoordinates(allCoordinates);
         checkOverlap(shipsPlaced, allCoordinates);
+        checkBoundaryOverlap(shipsPlaced, allCoordinates);
 
         // pass through all validations then add all requests in request body
         req.body[[shipType]] = allCoordinates;
