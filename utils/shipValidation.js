@@ -11,7 +11,7 @@ const checkShipTypeCount = async (shipType, sessionId) => {
     return shipsCount;
 }
 
-const getAllCoordinate = (startCoordinate, shipSize) => {
+const getAllCoordinates = (startCoordinate, shipSize) => {
 // calculate all coordinates of ship according to size in horizontal direction
     const coordinateX = startCoordinate[0];
     let allCoordinates = [];
@@ -23,28 +23,41 @@ const getAllCoordinate = (startCoordinate, shipSize) => {
     return allCoordinates;
 }
 
-const validateCoordinates = (allCoordinates) => {
+const validateCoordinates = (allCoordinates, throwError=true) => {
     for (eachCoordinate of allCoordinates){
         if (!(eachCoordinate[0] <= constants.GRID_X && eachCoordinate[1] <= constants.GRID_Y)){
-            throw Error(`Coordinates does not lie inside the board, board size is ${constants.GRID_X}X${constants.GRID_Y}`)
+            if (throwError)
+                throw Error(`Coordinates does not lie inside the board, board size is ${constants.GRID_X}X${constants.GRID_Y}`)
+            else
+                return false
         }    
     }
+    return true
 }
 
-const checkOverlap = (coordinates) => {
- // check overlap
+const checkOverlap = (shipsPlaced, coordinates) => {
+    // check overlap
+    shipsPlaced.map(dbVal => {
+        coordinates.map(inputVal => {
+            if (JSON.stringify(dbVal) == JSON.stringify(inputVal)) {
+                throw Error("Coordinates overlap with other ships present on the board")
+            }
+        })
+    });
 }
 
-exports.shipDataValidations = (req, res, next) => {
+exports.shipDataValidations = async (req, res, next) => {
     // ship validations
+    const shipsPlaced = await Ship.distinct("coordinates", {sessionId: req.headers["sessionid"]})
     const shipData = {...req.body};
     const shipType = Object.keys(shipData)[0];
     const shipTypeSize = constants.shipTypeCounts[[shipType]];
     const startCoordinates = Object.values(shipData)[0];
-
-    const allCoordinates = getAllCoordinate(startCoordinates, shipTypeSize);
+    
+    const allCoordinates = getAllCoordinates(startCoordinates, shipTypeSize);
     try{
         validateCoordinates(allCoordinates);
+        checkOverlap(shipsPlaced, allCoordinates);
 
         // pass through all validations then add all requests in request body
         req.body[[shipType]] = allCoordinates;
@@ -73,6 +86,7 @@ exports.shipPlaceAvailable = async (req, res, next) => {
                             })
             }
         }
-    }
+    }    
+    
     next();
 }
