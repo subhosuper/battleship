@@ -1,5 +1,5 @@
 const express = require('express');
-const {shipPlaceAvailable} = require("../utils/shipValidation");
+const {shipPlaceAvailable, shipDataValidations} = require("../utils/shipValidation");
 const {checkSession} = require("../utils/sessionValidation");
 
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
 const placeShipController = require("../controllers/placeShipController");
 
 router.route("/")
-                .post(shipPlaceAvailable, placeShipController.newShip);
+                .post(shipPlaceAvailable, shipDataValidations, placeShipController.newShip);
 
 
 module.exports = router;
