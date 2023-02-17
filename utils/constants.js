@@ -1,15 +1,15 @@
-export const GRID_X = 10;
-export const GRID_Y = 10; 
+const GRID_X = 10;
+const GRID_Y = 10; 
+const TOTAL_SHIP_COUNT = 10;
 
-
-export const shipTypeCounts = {
+const shipTypeCounts = {
     "battleship": 1,
     "cruiser": 2,
     "destroyer": 3,
     "submarine": 4
 }
 
-export const ground = [
+const ground = [
                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -22,10 +22,10 @@ export const ground = [
                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                       ]
 
-export const HIT = {"color": "red", value: 1};
-export const MISS = {"color": "blue", value: 2};
+const HIT = {"color": "red", value: 1};
+const MISS = {"color": "blue", value: 2};
 
-export const gameState = {
+const gameState = {
     "battleship-1": {hits: 0, size: 4},
     "cruiser-1": {hits: 0, size: 3},
     "cruiser-2": {hits: 0, size: 3},
@@ -39,4 +39,7 @@ export const gameState = {
     "sunk": 0,
     "miss": [], // store co-ordinates of the missed attacks
     "hit": []   // store co-ordinates of the hit attacks 
-}
+};
+
+exports.gameState = gameState;
+exports.ground = ground;
