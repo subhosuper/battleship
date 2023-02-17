@@ -5,6 +5,10 @@ const sessionSchema = new mongoose.Schema({
         type: String,
         required: [true, "Session id should be unique"],
         unique: true
+    },
+    isSetupDone: {
+        type: Boolean,
+        default: false
     }
 });
 
