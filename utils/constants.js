@@ -41,5 +41,4 @@ const gameState = {
     "hit": []   // store co-ordinates of the hit attacks 
 };
 
-exports.gameState = gameState;
-exports.ground = ground;
+exports.constants = {GRID_X, GRID_Y, TOTAL_SHIP_COUNT, shipTypeCounts};
