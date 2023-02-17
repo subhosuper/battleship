@@ -19,3 +19,19 @@ exports.newShip = async (req, res) => {
         })
 }
 
+exports.checkShipTypeCount = async (shipType, sessionId) => {
+    const query = Ship.find({
+        sessionId: sessionId,
+        type: shipType,
+    }).countDocuments();
+
+    const shipsCount = await query;
+    return shipsCount;
+}
+
+exports.allShipsOnboard = async (sessionId) => {
+    const query = Ship.distinct("coordinates", {sessionId: sessionId});
+
+    const ships = await query;
+    return ships;
+}

@@ -1,15 +1,6 @@
 const {constants} = require("../utils/constants");
-const Ship = require("../models/shipModel");
-
-const checkShipTypeCount = async (shipType, sessionId) => {
-    const query = Ship.find({
-        sessionId: sessionId,
-        type: shipType,
-    }).countDocuments();
-
-    const shipsCount = await query;
-    return shipsCount;
-}
+// const Ship = require("../models/shipModel");
+const {checkShipTypeCount ,allShipsOnboard} = require("../controllers/placeShipController");
 
 const getAllCoordinates = (startCoordinate, shipSize) => {
 // calculate all coordinates of ship according to size in horizontal direction
@@ -47,27 +38,28 @@ const checkOverlap = (shipsPlaced, coordinates) => {
 }
 
 const checkBoundaryOverlap = (shipsPlaced, coordinates) => {
+    const err = Error("Coordinates shouldn't overlap on the top, bottom, and both sides of any ship present on the board");
     const startCoordinate = [coordinates[0][0]-1, coordinates[0][1]] // Gets the top boundary
-    const endCoordinate = coordinates[coordinates.length - 1]; ++endCoordinate[0]; // Gets the bottom boundary
+    const endCoordinate = [coordinates[coordinates.length - 1][0]+1, coordinates[coordinates.length - 1][1]] // Gets the bottom boundary
 
     if (!shipsPlaced.length)
         return {}
     
     shipsPlaced.map(dbVal => {
         coordinates.map(inputVal => {
-            if (inputVal[0] === dbVal[0] && inputVal[1]-1 !== dbVal[1])
-            if (inputVal[0] === dbVal[0] && inputVal[1]+1 !== dbVal[1])
-            if (JSON.stringify(dbVal) !== JSON.stringify(startCoordinate))
-            if (JSON.stringify(dbVal) !== JSON.stringify(endCoordinate)) 
-            return {}
+            var rightCoordinate = [inputVal[0], inputVal[1]+1];
+            var leftCoordinate = [inputVal[0], inputVal[1]-1];
+            if (JSON.stringify(dbVal) === JSON.stringify(rightCoordinate)) throw err;
+            if (JSON.stringify(dbVal) === JSON.stringify(leftCoordinate)) throw err;
+            if (JSON.stringify(dbVal) === JSON.stringify(startCoordinate)) throw err;
+            if (JSON.stringify(dbVal) === JSON.stringify(endCoordinate)) throw err;
         });
     })
-    throw Error("Coordinates shouldn't overlap on the top, bottom, and both sides of any ship present on the board");
 }
 
 exports.shipDataValidations = async (req, res, next) => {
     // ship validations
-    const shipsPlaced = await Ship.distinct("coordinates", {sessionId: req.headers["sessionid"]})
+    const shipsPlaced = await allShipsOnboard(req.headers["sessionid"]);
     const shipData = {...req.body};
     const shipType = Object.keys(shipData)[0];
     const shipTypeSize = constants.shipTypeCounts[[shipType]];
