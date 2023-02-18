@@ -2,54 +2,87 @@ const missedMoves = require("../models/missedModel");
 const Ship = require("../models/shipModel");
 const attackValidations = require("../utils/attackValidation");
 const utility = require("../utils/utils");
-var ObjectId = require('mongoose').Types.ObjectId;
+const {constants} = require("../utils/constants");
+
 
 const updateMissMoves = async (req, attackCoordinates) => {
     const query = missedMoves.create({sessionId: req.headers["sessionid"], coordinates: attackCoordinates})
     await query;
 }
 
-const isHitsAvailable = async () => {
-    const query = Ship.find({status: "none"}).count();
+const isHitsAvailable = async (sessionId) => {
+    const query = Ship.find({sessionId: sessionId, status: "none"}).count();
     const noneCount = await query;
     if (!noneCount)
         throw Error("You are already a winner. Keep it up champ!")
 }
 
 const isShip = async (req, attackCoordinates) => {
+    let isSunk = false;
     const query = Ship.findOne({coordinates: attackCoordinates});
     const ships = await query;
     if (ships)
-    {   
+    {
         const query = Ship.updateOne(
                 {"sessionId": req.headers["sessionid"], "coordinates": attackCoordinates},
                 {"$set": {"status.$": "hit"}}
             )   
         const update = await query;
-        return true;
+        const hitCount = utility.getCount("hit", ships["status"])
+        if (hitCount+1 === ships["coordinates"].length)
+            isSunk = true
+        return {isShip: true, isSunk: isSunk, shipType: ships["type"]};
     }
-    return false;
+    return {isShip: false, isSunk: isSunk, shipType: undefined};
 }
 
-const checkInMissedMoves = (attackCoordinates) => {
-    // const query = missedMoves.
+const missedMovesCount = async (sessionId) => {
+    const query = missedMoves.find({sessionId: sessionId}).count();
+    const count = await query;
+    return count;
 }
 
-exports.attackController =  async (req, res, next) => {
+exports.attackController =  async (req, res) => {
     try{
         //call validations 
         const attackCoordinates = {...req.body}["attackCoordinates"];
         attackValidations.validateCoordinate(attackCoordinates);
-        isHitsAvailable();
-        if(!isShip(req, attackCoordinates)) updateMissMoves(req, attackCoordinates);
+        await isHitsAvailable(req.headers["sessionid"]);
+        const isHit = await isShip(req, attackCoordinates);
+        if( !( isHit["isShip"] ) )
+        {
+            updateMissMoves(req, attackCoordinates);
+            return res
+                        .status(200)
+                        .json({
+                            status: "success",
+                            message: "Miss"
+                        })
+        }
+        if (isHit["isSunk"]){
+            // TODO: add check for winner , TEST
+            if (attackValidations.checkForWinner(req.headers["sessionid"])){
+                const missedMoves = await missedMovesCount(req.headers["sessionid"]);
+                return res
+                            .status(200)
+                            .json({
+                                status: "success",
+                                message: `Win! You have completed the game in ${constants.TOTAL_UNITS_OF_ALL_SHIPS+missedMoves}`
+                            })
+                }
+            return res
+                .status(200)
+                .json({
+                    status: "success",
+                    message: `You just sank a ${isHit["shipType"]}`
+                });
+        }
 
-        // checkInMissedMoves(attackCoordinates);
-        
         res
             .status(200)
             .json({
-                status: "fail",
-                message: "dferf"
+                status: "success",
+                message: "Hit"
             })
     } catch(err) {
         res
