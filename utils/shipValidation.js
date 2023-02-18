@@ -1,6 +1,6 @@
 const {constants} = require("../utils/constants");
-// const Ship = require("../models/shipModel");
 const {checkShipTypeCount ,allShipsOnboard} = require("../controllers/placeShipController");
+const {setupDone} = require("..//controllers/sessionController");
 
 const getAllCoordinates = (startCoordinate, shipSize) => {
 // calculate all coordinates of ship according to size in horizontal direction
@@ -59,7 +59,8 @@ const checkBoundaryOverlap = (shipsPlaced, coordinates) => {
 
 exports.shipDataValidations = async (req, res, next) => {
     // ship validations
-    const shipsPlaced = await allShipsOnboard(req.headers["sessionid"]);
+    const sessionId = req.headers["sessionid"];
+    const shipsPlaced = await allShipsOnboard(sessionId);
     const shipData = {...req.body};
     const shipType = Object.keys(shipData)[0];
     const shipTypeSize = constants.shipTypeCounts[[shipType]];
@@ -81,6 +82,10 @@ exports.shipDataValidations = async (req, res, next) => {
                 message:  err.message
             })
     }
+
+    // TODO: Test this criteria
+    if ((shipsPlaced.length + allCoordinates.length) == constants.TOTAL_UNITS_OF_ALL_SHIPS)
+        await setupDone(sessionId);
     next();
 }
 
