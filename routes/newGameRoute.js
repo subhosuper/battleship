@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const newGameController = require("../controllers/newGameController");
+const sessionController = require("../controllers/sessionController");
 
 router.route("/")
-                .post(newGameController.createNewSession)
+                .post(sessionController.createNewSession)
 
 
 module.exports = router;
