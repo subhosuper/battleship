@@ -20,3 +20,9 @@ exports.setupDone = async (sessionId) => {
     const session = await query;
     console.log(session);
 }
+
+exports.getSession = async (sessionId) => {
+    const query = Session.find({sessionId: sessionId});
+    const session = await query;
+    return session;
+}
