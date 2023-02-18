@@ -39,3 +39,14 @@ exports.allShipsOnboard = async (sessionId) => {
     const ships = await query;
     return ships;
 }
+
+exports.countHits = async (sessionId) => {
+    const query = Ship.aggregate([
+        {"$match": {sessionId: sessionId}},
+        {"$unwind": "$status"},
+        {"$match": {"status": "hint" }},
+        {"$count": "hitCount"}
+    ])
+    const hitCount = await query;
+    return hitCount;
+}
