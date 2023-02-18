@@ -1,4 +1,3 @@
-const store = require('../store/storeObj');
 const {gameState, ground} = require("../utils/constants");
 
 exports.getGameStatus = (req, res) => {

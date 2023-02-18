@@ -13,6 +13,9 @@ const shipSchema = new mongoose.Schema({
     coordinates: {
         type: Array,
         required: [true, "Ship coordinates shouldn't be empty"]
+    },
+    status: {
+        type: Array
     }
 });
 
