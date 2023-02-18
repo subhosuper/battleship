@@ -7,5 +7,12 @@ const findInArray = (searchElement, searchList, index=false) => {
     return false;
 }
 
+const getCount = (countElement, countList) => {
+    let count = 0;
+    countList.map(elem => {
+        if (JSON.stringify(countElement) === JSON.stringify(elem)) count++;
+    });
+    return count;
+}
 
-module.exports = {findInArray};
+module.exports = {findInArray, getCount};
