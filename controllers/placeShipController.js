@@ -3,12 +3,12 @@ const Ship = require("../models/shipModel");
 exports.newShip = async (req, res) => {
 
     const data = {...req.body};
-    const coordinates = Object.values(data)[0];
+    const coordinates = data["coordinates"]
     const status = coordinates.map(elem => "none")
 
     const query = Ship.create({
         sessionId: req.headers["sessionid"],
-        type: Object.keys(data)[0],
+        type: data["type"],
         coordinates: coordinates,
         status: status
     });

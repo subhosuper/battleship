@@ -62,9 +62,13 @@ exports.shipDataValidations = async (req, res, next) => {
     const sessionId = req.headers["sessionid"];
     const shipsPlaced = await allShipsOnboard(sessionId);
     const shipData = {...req.body};
-    const shipType = Object.keys(shipData)[0];
+    // const shipType = Object.keys(shipData)[0];
+    const shipType = shipData["type"];
+
     const shipTypeSize = constants.SHIP_SIZE[[shipType]];
-    const startCoordinates = Object.values(shipData)[0];
+    // const startCoordinates = Object.values(shipData)[0];
+    const startCoordinates = shipData["coordinates"];
+
     
     const allCoordinates = getAllCoordinates(startCoordinates, shipTypeSize);
     try{
@@ -73,7 +77,7 @@ exports.shipDataValidations = async (req, res, next) => {
         checkBoundaryOverlap(shipsPlaced, allCoordinates);
 
         // pass through all validations then add all requests in request body
-        req.body[[shipType]] = allCoordinates;
+        req.body["coordinates"] = allCoordinates;
     } catch(err) {
         return res
             .status(400)
@@ -91,19 +95,31 @@ exports.shipDataValidations = async (req, res, next) => {
 
 exports.shipPlaceAvailable = async (req, res, next) => {
     const shipData = {...req.body};    
-    for (shipType in shipData){
-        if (shipType in constants.shipTypeCounts){
-            shipsCount = await checkShipTypeCount(shipType, req.headers["sessionid"]);
-            if (shipsCount === constants.shipTypeCounts[[shipType]]) {
-                return res
-                            .status(400)
-                            .json({
-                                status: "fail",
-                                message: `All ${shipType}s have been placed already`
-                            })
-            }
+    // for (shipType in shipData){
+    //     if (shipType in constants.shipTypeCounts){
+    //         shipsCount = await checkShipTypeCount(shipType, req.headers["sessionid"]);
+    //         if (shipsCount === constants.shipTypeCounts[[shipType]]) {
+    //             return res
+    //                         .status(400)
+    //                         .json({
+    //                             status: "fail",
+    //                             message: `All ${shipType}s have been placed already`
+    //                         })
+    //         }
+    //     }
+    // }    
+    const shipType = shipData["type"];
+    if (shipType in constants.shipTypeCounts){
+        const shipsCount = await checkShipTypeCount(shipType, req.headers["sessionid"]);
+        if (shipsCount === constants.shipTypeCounts[[shipType]]) {
+            return res
+                        .status(400)
+                        .json({
+                            status: "fail",
+                            message: `All ${shipType}s have been placed already`
+                        })
         }
-    }    
-    
+    }
+
     next();
 }
