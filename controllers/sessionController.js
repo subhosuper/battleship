@@ -22,7 +22,7 @@ exports.setupDone = async (sessionId) => {
 }
 
 exports.getSession = async (sessionId) => {
-    const query = Session.find({sessionId: sessionId});
+    const query = Session.findOne({sessionId: sessionId});
     const session = await query;
     return session;
 }

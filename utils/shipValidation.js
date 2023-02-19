@@ -83,7 +83,7 @@ exports.shipDataValidations = async (req, res, next) => {
             })
     }
 
-    // TODO: setupDOne update, TEST this criteria
+    // TODO: setupDOne update, TEST this criteria - TESTED OK
     if ((shipsPlaced.length + allCoordinates.length) == constants.TOTAL_UNITS_OF_ALL_SHIPS)
         await setupDone(sessionId);
     next();
