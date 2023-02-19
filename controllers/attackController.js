@@ -6,7 +6,14 @@ const {constants} = require("../utils/constants");
 
 
 const updateMissMoves = async (req, attackCoordinates) => {
-    const query = missedMoves.create({sessionId: req.headers["sessionid"], coordinates: attackCoordinates})
+
+    // const query = missedMoves.create({sessionId: req.headers["sessionid"], coordinates:  [attackCoordinates]})
+    const query = missedMoves.findOneAndUpdate(
+            {sessionId: req.headers["sessionid"], coordinates:  [attackCoordinates]},
+            {sessionId: req.headers["sessionid"], coordinates:  [attackCoordinates]},
+            { upsert: true, new: true, setDefaultsOnInsert: true}
+        )
+
     await query;
 }
 
