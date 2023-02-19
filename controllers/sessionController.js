@@ -18,7 +18,6 @@ exports.setupDone = async (sessionId) => {
     const query = Session.updateOne({sessionId: sessionId}, {"$set": {"isSetupDone": true}})
 
     const session = await query;
-    console.log(session);
 }
 
 exports.getSession = async (sessionId) => {
