@@ -44,7 +44,7 @@ exports.countHits = async (sessionId) => {
     const query = Ship.aggregate([
         {"$match": {sessionId: sessionId}},
         {"$unwind": "$status"},
-        {"$match": {"status": "hint" }},
+        {"$match": {"status": "hit" }},
         {"$count": "hitCount"}
     ])
     const hitCount = await query;
