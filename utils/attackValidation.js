@@ -24,8 +24,10 @@ const validateAttack = async (req, res, next) => {
 
 const checkForWinner = async (sessionId) => {
     const hitCount = await countHits(sessionId);
-    if(hitCount.length && (hitCount[0]["hitCount"] === constants.TOTAL_UNITS_OF_ALL_SHIPS))
+    if(hitCount.length > 0 && (hitCount[0]["hitCount"] === constants.TOTAL_UNITS_OF_ALL_SHIPS))
+    {
         return true;
+    }
     return false;
 }
 

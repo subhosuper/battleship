@@ -19,15 +19,33 @@ const isHitsAvailable = async (sessionId) => {
 
 const isShip = async (req, attackCoordinates) => {
     let isSunk = false;
-    const query = Ship.findOne({coordinates: attackCoordinates});
-    const ships = await query;
-    if (ships)
+    const query = Ship.aggregate( [ {$match: {sessionId: req.headers["sessionid"]}},
     {
-        const query = Ship.updateOne(
+        $project: {
+           index: { $indexOfArray: [ "$coordinates", attackCoordinates ] },
+            status: 1,
+            coordinates: 1,
+            type: 1
+        }},
+        {"$unwind": "$index"},
+        {"$match":{"index":{"$ne":-1}}}
+    ]);
+
+    
+    var ships = await query;
+    if (ships.length > 0)
+    {
+        ships = ships[0];
+        const index = ships["index"];
+        if (ships["status"][[index]] == "none"){
+            const updateQuery = Ship.updateOne(
                 {"sessionId": req.headers["sessionid"], "coordinates": attackCoordinates},
                 {"$set": {"status.$": "hit"}}
-            )   
-        const update = await query;
+            )
+            await updateQuery;
+        }
+        else throw Error("The coordinate was already hit")
+        
         const hitCount = utility.getCount("hit", ships["status"])
         if (hitCount+1 === ships["coordinates"].length)
             isSunk = true
@@ -61,13 +79,13 @@ exports.attackController =  async (req, res) => {
         }
         if (isHit["isSunk"]){
             // TODO: add check for winner , TEST
-            if (attackValidations.checkForWinner(req.headers["sessionid"])){
+            if ((await attackValidations.checkForWinner(req.headers["sessionid"]))){
                 const missedMoves = await missedMovesCount(req.headers["sessionid"]);
                 return res
                             .status(200)
                             .json({
                                 status: "success",
-                                message: `Win! You have completed the game in ${constants.TOTAL_UNITS_OF_ALL_SHIPS+missedMoves}`
+                                message: `Win! You have completed the game in ${constants.TOTAL_UNITS_OF_ALL_SHIPS+missedMoves} moves`
                             })
                 }
             return res
