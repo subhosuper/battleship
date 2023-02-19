@@ -63,7 +63,7 @@ exports.shipDataValidations = async (req, res, next) => {
     const shipsPlaced = await allShipsOnboard(sessionId);
     const shipData = {...req.body};
     const shipType = Object.keys(shipData)[0];
-    const shipTypeSize = constants.shipTypeCounts[[shipType]];
+    const shipTypeSize = constants.SHIP_SIZE[[shipType]];
     const startCoordinates = Object.values(shipData)[0];
     
     const allCoordinates = getAllCoordinates(startCoordinates, shipTypeSize);
