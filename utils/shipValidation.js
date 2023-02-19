@@ -2,13 +2,23 @@ const {constants} = require("../utils/constants");
 const {checkShipTypeCount ,allShipsOnboard} = require("../controllers/placeShipController");
 const {setupDone} = require("..//controllers/sessionController");
 
-const getAllCoordinates = (startCoordinate, shipSize) => {
-// calculate all coordinates of ship according to size in horizontal direction
-    const coordinateX = startCoordinate[0];
+const getAllCoordinates = (startCoordinate, shipSize, direction="vertical") => {
+// calculate all coordinates of ship according to size in vertical direction
+    let variableCoordinate;
+    
+    if (direction === "vertical") {
+        variableCoordinate = startCoordinate[0];
+    } else {
+        variableCoordinate = startCoordinate[1];
+    }
     let allCoordinates = [];
 
     for (var i=0; i<shipSize; i++){
-        allCoordinates.push([coordinateX + i, startCoordinate[1]]);
+        if (direction === "vertical") {
+            allCoordinates.push([variableCoordinate + i, startCoordinate[1]]);
+        } else {
+            allCoordinates.push([startCoordinate[0], variableCoordinate + i]);
+        }
     }
     console.log("All coordinates: ", allCoordinates);
     return allCoordinates;
@@ -37,18 +47,33 @@ const checkOverlap = (shipsPlaced, coordinates) => {
     });
 }
 
-const checkBoundaryOverlap = (shipsPlaced, coordinates) => {
+const checkBoundaryOverlap = (shipsPlaced, coordinates, direction="vertical") => {
     const err = Error("Coordinates shouldn't overlap on the top, bottom, and both sides of any ship present on the board");
-    const startCoordinate = [coordinates[0][0]-1, coordinates[0][1]] // Gets the top boundary
-    const endCoordinate = [coordinates[coordinates.length - 1][0]+1, coordinates[coordinates.length - 1][1]] // Gets the bottom boundary
+    
+    let startCoordinate, endCoordinate;
+    
+    if (direction === "vertical"){
+        startCoordinate = [coordinates[0][0]-1, coordinates[0][1]] // Gets the top boundary
+        endCoordinate = [coordinates[coordinates.length - 1][0]+1, coordinates[coordinates.length - 1][1]] // Gets the bottom boundary
+    } else {
+        startCoordinate = [coordinates[0][0], coordinates[0][1]-1] // Gets the left side start boundary
+        endCoordinate = [coordinates[coordinates.length - 1][0], coordinates[coordinates.length - 1][1]+1] // Gets the bottom boundary
+    }
 
     if (!shipsPlaced.length)
         return {}
     
     shipsPlaced.map(dbVal => {
         coordinates.map(inputVal => {
-            var rightCoordinate = [inputVal[0], inputVal[1]+1];
-            var leftCoordinate = [inputVal[0], inputVal[1]-1];
+
+            if (direction === "vertical"){
+                var rightCoordinate = [inputVal[0], inputVal[1]+1];
+                var leftCoordinate = [inputVal[0], inputVal[1]-1];
+            } else {
+                var rightCoordinate = [inputVal[0]+1, inputVal[1]];
+                var leftCoordinate = [inputVal[0]-1, inputVal[1]];
+            }
+
             if (JSON.stringify(dbVal) === JSON.stringify(rightCoordinate)) throw err;
             if (JSON.stringify(dbVal) === JSON.stringify(leftCoordinate)) throw err;
             if (JSON.stringify(dbVal) === JSON.stringify(startCoordinate)) throw err;
@@ -68,13 +93,12 @@ exports.shipDataValidations = async (req, res, next) => {
     const shipTypeSize = constants.SHIP_SIZE[[shipType]];
     // const startCoordinates = Object.values(shipData)[0];
     const startCoordinates = shipData["coordinates"];
-
     
-    const allCoordinates = getAllCoordinates(startCoordinates, shipTypeSize);
+    const allCoordinates = getAllCoordinates(startCoordinates, shipTypeSize, shipData["direction"]);
     try{
         validateCoordinates(allCoordinates);
         checkOverlap(shipsPlaced, allCoordinates);
-        checkBoundaryOverlap(shipsPlaced, allCoordinates);
+        checkBoundaryOverlap(shipsPlaced, allCoordinates, shipData["direction"]);
 
         // pass through all validations then add all requests in request body
         req.body["coordinates"] = allCoordinates;
