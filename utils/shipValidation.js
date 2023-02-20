@@ -1,6 +1,7 @@
 const {constants} = require("../utils/constants");
 const {checkShipTypeCount ,allShipsOnboard} = require("../controllers/placeShipController");
 const {setupDone} = require("..//controllers/sessionController");
+const validator = require('../utils/inputValidator');
 
 const getAllCoordinates = (startCoordinate, shipSize, direction="vertical") => {
 // calculate all coordinates of ship according to size in vertical direction
@@ -51,7 +52,7 @@ const checkBoundaryOverlap = (shipsPlaced, coordinates, direction="vertical") =>
     const err = Error("Coordinates shouldn't overlap on the top, bottom, and both sides of any ship present on the board");
     
     let startCoordinate, endCoordinate;
-    
+
     if (direction === "vertical"){
         startCoordinate = [coordinates[0][0]-1, coordinates[0][1]] // Gets the top boundary
         endCoordinate = [coordinates[coordinates.length - 1][0]+1, coordinates[coordinates.length - 1][1]] // Gets the bottom boundary
@@ -143,7 +144,35 @@ exports.shipPlaceAvailable = async (req, res, next) => {
                             message: `All ${shipType}s have been placed already`
                         })
         }
+    } else {
+        return res
+                    .status(400)
+                    .json({
+                        status: "failed",
+                        message: "Ship type not available"
+                    })
     }
 
     next();
+}
+
+exports.shipInputValidator = async (req, res, next) => {
+    const validationRule = {
+        "type": "required|string",
+        "coordinates": "required|array|restrict:length:2,type:number",
+        "direction": "required|string|choices:horizontal,vertical"
+    };
+
+    await validator(req.body, validationRule, {}, (err, status) => {
+        if (!status) {
+            res.status(412)
+                .send({
+                    status: "failed",
+                    message: 'Validation failed',
+                    data: err
+                });
+        } else {
+            next();
+        }
+    }).catch( err => console.log(err))
 }
