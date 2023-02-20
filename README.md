@@ -12,43 +12,43 @@ Steps to setup:
 
 
 Request structure of APIs:
-1. http://localhost:3000/api/v1/new-game
+1. http://localhost:3000/api/v1/new-game - **POST**
    
-   headers: none
-   body: none
+   - headers: none
+   - body: none
 
-2. http://localhost:3000/api/v1/place-ship
+2. http://localhost:3000/api/v1/place-ship - **POST**
 
-   headers: {sessionid: value}
-   Get the value of session id from output of API 1
+   - headers: `{sessionid: value}` <br />
+     Get the value of session id from output of API 1
    
-   body:
+   - body:
 
-   type: type of ship
-   coordinates: Starting point of the ship - [X coordinate, Y coordinate]
-   direction: In which direction shall the ship be placed on the board - horizontal or vertical
+       > type: type of ship <br />
+       > coordinates: Starting point of the ship - [X coordinate, Y coordinate] <br />
+       > direction: In which direction shall the ship be placed on the board - horizontal or vertical <br />
 
-   e.g.: {
+   e.g.: `{
             "type": "submarine", 
             "coordinates": [9,10],
             "direction": "horizontal"
-        }
-3. http://localhost:3000/api/v1/attack
+        }`
+3. http://localhost:3000/api/v1/attack - **POST**
   
-   headers: {sessionid: value}
-   Get the value of session id from output of API 1
+   - headers: `{sessionid: value}` <br />
+     Get the value of session id from output of API 1
 
-   body:
+   - body:
 
-   attackCoordinates: Coordinates of the point to be attacked - [X coordinate, Y coordinate]
+       > attackCoordinates: Coordinates of the point to be attacked - [X coordinate, Y coordinate] <br />
 
-   e.g.: {
+   e.g.: `{
             "attackCoordinates": [1,1]
-         }
+         }`
 
-4. http://localhost:3000/api/v1/status
+4. http://localhost:3000/api/v1/status - **GET**
   
-   headers: {sessionid: value}
+   headers: `{sessionid: value}` <br />
    Get the value of session id from output of API 1
 
    
