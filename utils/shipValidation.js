@@ -52,13 +52,23 @@ const checkBoundaryOverlap = (shipsPlaced, coordinates, direction="vertical") =>
     const err = Error("Coordinates shouldn't overlap on the top, bottom, and both sides of any ship present on the board");
     
     let startCoordinate, endCoordinate;
+    let northEast, northWest, southEast, southWest;
 
     if (direction === "vertical"){
         startCoordinate = [coordinates[0][0]-1, coordinates[0][1]] // Gets the top boundary
         endCoordinate = [coordinates[coordinates.length - 1][0]+1, coordinates[coordinates.length - 1][1]] // Gets the bottom boundary
+        northWest = [startCoordinate[0], startCoordinate[1]-1];
+        northEast = [startCoordinate[0], startCoordinate[1]+1];
+        southWest = [endCoordinate[0], endCoordinate[1]-1];
+        southEast = [endCoordinate[0], endCoordinate[1]+1];
+
     } else {
         startCoordinate = [coordinates[0][0], coordinates[0][1]-1] // Gets the left side start boundary
         endCoordinate = [coordinates[coordinates.length - 1][0], coordinates[coordinates.length - 1][1]+1] // Gets the bottom boundary
+        northWest = [startCoordinate[0]-1, startCoordinate[1]];
+        northEast = [endCoordinate[0]-1, endCoordinate[1]];
+        southWest = [startCoordinate[0]+1, startCoordinate[1]];
+        southEast = [endCoordinate[0]+1, endCoordinate[1]];
     }
 
     if (!shipsPlaced.length)
@@ -79,6 +89,10 @@ const checkBoundaryOverlap = (shipsPlaced, coordinates, direction="vertical") =>
             if (JSON.stringify(dbVal) === JSON.stringify(leftCoordinate)) throw err;
             if (JSON.stringify(dbVal) === JSON.stringify(startCoordinate)) throw err;
             if (JSON.stringify(dbVal) === JSON.stringify(endCoordinate)) throw err;
+            if (JSON.stringify(dbVal) === JSON.stringify(northWest)) throw err;
+            if (JSON.stringify(dbVal) === JSON.stringify(northEast)) throw err;
+            if (JSON.stringify(dbVal) === JSON.stringify(southWest)) throw err;
+            if (JSON.stringify(dbVal) === JSON.stringify(southEast)) throw err;
         });
     })
 }

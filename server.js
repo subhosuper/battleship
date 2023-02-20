@@ -1,7 +1,7 @@
 const app = require("./app");
 const mongoose = require('mongoose');
 
-const DB = "mongodb://root:battle123root@127.0.0.1:27017/battleship?authSource=admin";
+const DB = "mongodb://root:battle123root@mongo_battleship:27017/battleship?authSource=admin";
 mongoose.set('strictQuery', false);
 mongoose.connect(DB, {
     useNewUrlParser: true,

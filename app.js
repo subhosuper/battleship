@@ -1,7 +1,7 @@
 const express = require('express');
 
 //import middlewares
-const checkSession = require("./utils/sessionValidation");
+// const checkSession = require("./utils/sessionValidation");
 
 // import routes
 const statusRoute = require("./routes/statusRoute");

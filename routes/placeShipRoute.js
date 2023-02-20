@@ -1,6 +1,6 @@
 const express = require('express');
 const {shipPlaceAvailable, shipDataValidations} = require("../utils/shipValidation");
-const {checkSession} = require("../utils/sessionValidation");
+// const {checkSession} = require("../utils/sessionValidation");
 
 const router = express.Router();
 
