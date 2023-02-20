@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    </head>
+    <title>
+        Battleship status
+    </title>
+    <body>
+        <input type="text" id="sessionid">
+        <button id="showBoard" onclick="getStatus()">Show Board</button>
+        <button id="clearBoard" onclick={window.location.reload();}>Clear Board</button>
+        <div id="mainDiv"></div>
+
+        <script>
+            function getStatus(){
+                const sessionId = $("#sessionid").val();
+                console.log(sessionId)
+                if (!sessionId) return alert("Please enter valid session id")
+                $.get({url: "http://localhost:3000/api/v1/status",
+                      headers: {sessionid: sessionId}
+                      }, function(data, status){
+                            var gridX = data.data.gridX, gridY = data.data.gridY, hits = data.data.hits, missed = data.data.missed; 
+                            for (var i=1; i<=gridX; i++){
+                                $("div").append(`<p id=row${i+1}></p>`);
+                                for (var j=1; j<=gridY; j++){
+                                    var f = true;
+                                    for (var l=0;l<hits.length;l++){
+                                        if (JSON.stringify(hits[l]) === JSON.stringify([i,j])){ $(`#row${i+1}`).append("    O     "); f = false; }
+                                        else if (JSON.stringify(missed[l]) === JSON.stringify([i,j])){ $(`#row${i+1}`).append("    X    "); f = false; }
+                                    }
+                                    if (f){
+                                        $(`#row${i+1}`).append("    B    ");
+
+                                    }
+                            }
+                            console.log("\n")
+                        }
+                        console.log(data.data, status)
+                      })
+                    }
+        </script>
+    </body>
+</html>

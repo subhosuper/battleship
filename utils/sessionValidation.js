@@ -8,7 +8,7 @@ exports.sessionValidation = async (req, res, next) => {
                 .status(400)
                 .json({
                     status: "fail",
-                    message: "Session id should be present in headers inside key: sessionid"
+                    message: "Valid session id should be present in headers inside key: sessionid"
                 });
     }
 
