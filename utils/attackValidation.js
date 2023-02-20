@@ -3,7 +3,7 @@ const {getSession} = require("../controllers/sessionController");
 const {countHits} = require("../controllers/placeShipController");
 const validator = require('../utils/inputValidator');
 
-const validateCoordinate = async (coordinates) => {
+const validateCoordinate = (coordinates) => {
     if (!(coordinates[0] <= constants.GRID_X && coordinates[1] <= constants.GRID_Y))
         throw Error(`Coordinates does not lie inside the board, board size is ${constants.GRID_X}X${constants.GRID_Y}`)        
 }
