@@ -1,6 +1,10 @@
 FROM node:lts
 
-COPY . .
+ENV APP_PATH /src
+
+COPY . ${APP_PATH}
+
+WORKDIR ${APP_PATH}
 
 RUN npm install --force
 
