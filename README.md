@@ -6,7 +6,7 @@ Steps to setup:
 2. Enter the project folder: cd battleship
 3. Run docker-compose file in detach mode: docker-compose up -d
 4. Use tools like Postman to use the APIs.
-5. Under the project folder inside "public" folder, open "status.html" file in a browser
+5. Under the project folder inside "public" folder, open "status.html" file in a browser, you might have to use a CORS Unblocker.
 6. Enter a session id in the input box and click "Show Board" anytime to view the board.
 7. Get session id after a successful POST request to `/api/v1/new-game`
 
