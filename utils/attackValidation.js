@@ -1,7 +1,7 @@
 const {constants} = require("../utils/constants");
 const {getSession} = require("../controllers/sessionController");
-
 const {countHits} = require("../controllers/placeShipController");
+const validator = require('../utils/inputValidator');
 
 const validateCoordinate = async (coordinates) => {
     if (!(coordinates[0] <= constants.GRID_X && coordinates[1] <= constants.GRID_Y))
@@ -31,4 +31,23 @@ const checkForWinner = async (sessionId) => {
     return false;
 }
 
-module.exports = {validateCoordinate, validateAttack, checkForWinner};
+const attackInputValidator = async (req, res, next) => {
+    const validationRule = {
+        "attackCoordinates": "required|array|restrict:length:2,type:number",
+    };
+
+    await validator(req.body, validationRule, {}, (err, status) => {
+        if (!status) {
+            res.status(412)
+                .send({
+                    status: "failed",
+                    message: 'Validation failed',
+                    data: err
+                });
+        } else {
+            next();
+        }
+    }).catch( err => console.log(err))
+}
+
+module.exports = {validateCoordinate, validateAttack, checkForWinner, attackInputValidator};
