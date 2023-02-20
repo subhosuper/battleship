@@ -9,6 +9,16 @@
         <input type="text" id="sessionid">
         <button id="showBoard" onclick="getStatus()">Show Board</button>
         <button id="clearBoard" onclick={window.location.reload();}>Clear Board</button>
+        <div>
+            Legends:
+            <br><br>
+            B - blank, coordinate has not been attacked yet
+            <br>
+            X - miss, coordinate has been attacked but ship is not present
+            <br>
+            O - hit,  coordinate has been attacked and ship is present
+            <br>
+        </div>
         <div id="mainDiv"></div>
 
         <script>
